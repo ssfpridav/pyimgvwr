@@ -30,7 +30,7 @@ class MainFrame(wx.Frame):
     def setupFileList(self):
         self.dirname = os.path.dirname(self.filepath)
         filename = os.path.basename(self.filepath)
-        self.fileList = os.listdir(self.dirname)
+        self.getFileList()        
         self.filePosition = -1
         for i in xrange(0, len(self.fileList)):
             if (self.fileList[i] == filename):
@@ -40,6 +40,17 @@ class MainFrame(wx.Frame):
                 #print '{0}th file: {1} is not a match to {2}'.format(i, self.fileList[i], self.filepath)
         
         print 'viewing {0}th file of {1}'.format(self.filePosition, len(self.fileList))
+
+    def getFileList(self):
+        filteredList = []
+        rawlist = os.listdir(self.dirname)
+        for i in xrange(0, len(rawlist)):
+            if rawlist[i].endswith((".png",".jpg",".gif",".tif",".jpeg")):
+                filteredList.append(rawlist[i])
+
+        self.fileList = sorted(filteredList)
+        print "first: {0} and last: {1}".format(self.fileList[0], self.fileList[len(self.fileList)-1])
+        return self.fileList
 
     def createMenuBar(self):
         menubar = wx.MenuBar()
@@ -90,19 +101,25 @@ class MainFrame(wx.Frame):
         self.Refresh()
 
     def loadPreviousImage(self):
-        if self.filePosition > 1:
+        if self.filePosition >= 1:
             self.filePosition = self.filePosition - 1
-            print 'new position: {0}'.format(self.filePosition)
             self.filepath = os.path.normpath('{0}/{1}'.format(self.dirname, self.fileList[self.filePosition]))
-            print 'new position {0}, new file: {1}'.format(self.filePosition, self.filepath)
+            self.loadImage()
+        else: #loop around
+            self.filePosition = len(self.fileList)-1
+            self.filepath = os.path.normpath('{0}/{1}'.format(self.dirname, self.fileList[self.filePosition]))
             self.loadImage()
 
     def loadNextImage(self):
-        if self.filePosition < len(self.fileList)-2:
+        if self.filePosition <= len(self.fileList)-2:
             self.filePosition = self.filePosition + 1
             self.filepath = os.path.normpath('{0}/{1}'.format(self.dirname, self.fileList[self.filePosition]))
             self.loadImage()
-
+        else: #loop around
+            self.filePosition = 0
+            self.filepath = os.path.normpath('{0}/{1}'.format(self.dirname, self.fileList[self.filePosition]))
+            self.loadImage()
+            
     def onReSize(self, event):
         self.scaleImage()
         event.Skip()
@@ -184,5 +201,8 @@ class PhotoCtrl(wx.App):
 #endClass
 
 if __name__ == '__main__':
-    app = PhotoCtrl(sys.argv[1])
-    app.MainLoop()
+    if len(sys.argv) < 2:
+        print "Usage {0} <firstImageFile>".format(sys.argv[0])
+    else:
+        app = PhotoCtrl(sys.argv[1])
+        app.MainLoop()
