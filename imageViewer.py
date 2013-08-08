@@ -19,10 +19,20 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_KILL_FOCUS, self.onLoseFocus)
 
     def initialize(self, filepath):
+        # initialize some ui stuff
         self.panel = wx.Panel(parent=self)
         self.panel.SetFocus()
+        self.panel.SetBackgroundColour('#000000')
+        #self.vbox = wx.BoxSizer(wx.VERTICAL)
+        #self.hbox = wx.BoxSizer(wx.HORIZONTAL)
+        #self.panel.SetSizer(self.vbox)
+
+        # other variables
         self.filepath = filepath
         self.imageCtrl = None
+        self.fullScreen = False
+
+        # actual setup
         self.setupFileList()
         self.createMenuBar()
         self.loadImage()
@@ -74,11 +84,17 @@ class MainFrame(wx.Frame):
         self.img = self.rawimg
         self.imageCtrl = wx.StaticBitmap(self.panel, wx.ID_ANY, 
                                          wx.BitmapFromImage(self.rawimg))
-        self.scaleImage()
+        #self.vbox.Add(self.imageCtrl, proportion = 0, flag = wx.ALIGN_CENTER, border = 40)
+        self.scaleAndPositionImage()
 
     def removeOldControls(self):
         if not self.imageCtrl == None:
             self.imageCtrl.Destroy()
+
+    def scaleAndPositionImage(self):
+        self.scaleImage()
+        self.positionImage()
+        self.Refresh()
 
     def scaleImage(self):
         frmWidth,  frmHeight = self.GetSize()
@@ -96,9 +112,22 @@ class MainFrame(wx.Frame):
             NewW = self.imgWidth * heightScale
             NewH = frmHeight
 
-        self.img = self.rawimg.Scale(NewW,NewH)
+        self.img = self.rawimg.Scale(NewW,NewH, quality = wx.IMAGE_QUALITY_HIGH)
         self.imageCtrl.SetBitmap(wx.BitmapFromImage(self.img))
-        self.Refresh()
+
+    def positionImage(self):
+        frmWidth, frmHeight = self.GetSize()
+        imgWidth, imgHeight = self.imageCtrl.GetSize()
+        newX = 0
+        newY = 0
+        if not frmWidth == imgWidth:
+            newX = (frmWidth - imgWidth) / 2
+
+        if not frmHeight == imgHeight:
+            newY = (frmHeight - imgHeight) / 2
+
+        print "trying to move the image to {0},{1}".format(newX, newY)
+        self.imageCtrl.SetPosition((newX, newY))
 
     def loadPreviousImage(self):
         if self.filePosition >= 1:
@@ -119,9 +148,17 @@ class MainFrame(wx.Frame):
             self.filePosition = 0
             self.filepath = os.path.normpath('{0}/{1}'.format(self.dirname, self.fileList[self.filePosition]))
             self.loadImage()
+
+    def toggleFullScreen(self):
+        if not self.fullScreen:
+            self.fullScreen = True
+            self.ShowFullScreen(True)
+        else:
+            self.fullScreen = False
+            self.ShowFullScreen(False)
             
     def onReSize(self, event):
-        self.scaleImage()
+        self.scaleAndPositionImage()
         event.Skip()
 
     def onMove(self, event):
@@ -146,6 +183,8 @@ class MainFrame(wx.Frame):
             self.loadPreviousImage()
         elif keycode == wx.WXK_RIGHT or keycode == wx.WXK_PAGEDOWN or keycode == wx.WXK_DOWN:
             self.loadNextImage()
+        elif keycode == wx.WXK_F11:
+            self.toggleFullScreen()
 
         event.Skip()
 
