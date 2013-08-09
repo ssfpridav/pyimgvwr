@@ -15,3 +15,12 @@ pyimgvwr is a simple image viewer. Goal is to be minimalistic and focus on displ
 
 ** Distant Future Features **
  * A flyover GUI to control most features in addition  to the keyboard commands (similar to what Fastone does with its full screen hot zones)
+
+
+** Requirements **
+For Ubuntu: 
+First install most prerequisites:
+`sudo apt-get install python python-pip python-wxgtk2.8 libjpeg-dev`python-dev
+
+Then install the python image library:
+`sudo pip install PIL`
