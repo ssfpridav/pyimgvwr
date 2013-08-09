@@ -1,6 +1,17 @@
 pyimgvwr
 ========
-This is a project to accomplish a few goals: 
-1. To have something to do with my Raspberry Pi
-1. To learn python better 
-1. To produce an image viewer that has certain features - mostly keyboard control of slideshow types of things. I know there are a lot of them out there already, but I won't learn python by using an existing image viewer. 
+pyimgvwr is a simple image viewer. Goal is to be minimalistic and focus on displaying one image at a time - not a thumbnail browser. Initially most navigation and commands will be via keyboard rather than a gui.
+
+** Current Features **
+ * full screen
+ * image scaling to fit window
+ * forward/back through directory of images via arrow keys
+
+
+** Planned Features ** 
+ * Scan directory for changes to list of image files - automatically display new image
+ * play slideshow - w/ keyboard commands for reversing direction, randomizing/sorting order, etc.
+ * 
+
+** Distant Future Features **
+ * A flyover GUI to control most features in addition  to the keyboard commands (similar to what Fastone does with its full screen hot zones)
